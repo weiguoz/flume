@@ -371,7 +371,7 @@ public class RobustReliableSpoolingFileEventReader implements ReliableEventReade
                         (fileName.endsWith(completedSuffix)) ||
                         (fileName.startsWith(".")) ||
                         ignorePattern.matcher(fileName).matches() ||
-                        (System.currentTimeMillis() - candidate.lastModified() > 600000)) {
+                        (System.currentTimeMillis() - candidate.lastModified() < 600000)) {
                     return false;
                 }
                 return true;
