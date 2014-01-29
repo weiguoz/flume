@@ -261,13 +261,11 @@ public class RobustReliableSpoolingFileEventReader implements ReliableEventReade
         // Verify that spooling assumptions hold
         if (fileToRoll.lastModified() != currentFile.get().getLastModified()) {
             String message = "File has been modified since being read: " + fileToRoll;
-            //throw new IllegalStateException(message);
-            return;
+            throw new IllegalStateException(message);
         }
         if (fileToRoll.length() != currentFile.get().getLength()) {
             String message = "File has changed size since being read: " + fileToRoll;
-            //throw new IllegalStateException(message);
-            return;
+            throw new IllegalStateException(message);
         }
 
         if (deletePolicy.equalsIgnoreCase(DeletePolicy.NEVER.name())) {
@@ -372,7 +370,8 @@ public class RobustReliableSpoolingFileEventReader implements ReliableEventReade
                 if ((candidate.isDirectory()) ||
                         (fileName.endsWith(completedSuffix)) ||
                         (fileName.startsWith(".")) ||
-                        ignorePattern.matcher(fileName).matches()) {
+                        ignorePattern.matcher(fileName).matches() ||
+                        (System.currentTimeMillis() - candidate.lastModified() > 600000)) {
                     return false;
                 }
                 return true;
