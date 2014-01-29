@@ -371,7 +371,7 @@ public class RobutReliableSpoolingFileEventReader implements ReliableEventReader
                         (fileName.endsWith(completedSuffix)) ||
                         (fileName.startsWith(".")) ||
                         ignorePattern.matcher(fileName).matches() ||
-                        (System.currentTimeMillis() - candidate.lastModified() > 60000L)) {
+                        (System.currentTimeMillis() - candidate.lastModified() < 60000L)) {
                     return false;
                 }
                 return true;
