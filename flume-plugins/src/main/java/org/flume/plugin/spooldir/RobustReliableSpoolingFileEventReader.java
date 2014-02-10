@@ -51,10 +51,10 @@ import com.google.common.io.Files;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class RobutReliableSpoolingFileEventReader implements ReliableEventReader {
+public class RobustReliableSpoolingFileEventReader implements ReliableEventReader {
 
     private static final Logger logger = LoggerFactory
-            .getLogger(RobutReliableSpoolingFileEventReader.class);
+            .getLogger(RobustReliableSpoolingFileEventReader.class);
 
     static final String metaFileName = ".flumespool-main.meta";
 
@@ -75,13 +75,13 @@ public class RobutReliableSpoolingFileEventReader implements ReliableEventReader
     private boolean committed = true;
 
     /**
-     * Create a RobutReliableSpoolingFileEventReader to watch the given directory.
+     * Create a RobustReliableSpoolingFileEventReader to watch the given directory.
      */
-    private RobutReliableSpoolingFileEventReader(File spoolDirectory,
-                                            String completedSuffix, String ignorePattern, String trackerDirPath,
-                                            boolean annotateFileName, String fileNameHeader,
-                                            String deserializerType, Context deserializerContext,
-                                            String deletePolicy, String inputCharset) throws IOException {
+    private RobustReliableSpoolingFileEventReader(File spoolDirectory,
+                                                  String completedSuffix, String ignorePattern, String trackerDirPath,
+                                                  boolean annotateFileName, String fileNameHeader,
+                                                  String deserializerType, Context deserializerContext,
+                                                  String deletePolicy, String inputCharset) throws IOException {
 
         // Sanity checks
         Preconditions.checkNotNull(spoolDirectory);
@@ -103,7 +103,7 @@ public class RobutReliableSpoolingFileEventReader implements ReliableEventReader
         if (logger.isDebugEnabled()) {
             logger.debug("Initializing {} with directory={}, metaDir={}, " +
                     "deserializer={}",
-                    new Object[] { RobutReliableSpoolingFileEventReader.class.getSimpleName(),
+                    new Object[] { RobustReliableSpoolingFileEventReader.class.getSimpleName(),
                             spoolDirectory, trackerDirPath, deserializerType });
         }
 
@@ -370,7 +370,8 @@ public class RobutReliableSpoolingFileEventReader implements ReliableEventReader
                 if ((candidate.isDirectory()) ||
                         (fileName.endsWith(completedSuffix)) ||
                         (fileName.startsWith(".")) ||
-                        ignorePattern.matcher(fileName).matches()) {
+                        ignorePattern.matcher(fileName).matches() ||
+                        (System.currentTimeMillis() - candidate.lastModified() < 600000)) {
                     return false;
                 }
                 return true;
@@ -463,7 +464,7 @@ public class RobutReliableSpoolingFileEventReader implements ReliableEventReader
     }
 
     /**
-     * Special builder class for RobutReliableSpoolingFileEventReader
+     * Special builder class for RobustReliableSpoolingFileEventReader
      */
     public static class Builder {
         private File spoolDirectory;
@@ -535,8 +536,8 @@ public class RobutReliableSpoolingFileEventReader implements ReliableEventReader
             return this;
         }
 
-        public RobutReliableSpoolingFileEventReader build() throws IOException {
-            return new RobutReliableSpoolingFileEventReader(spoolDirectory, completedSuffix,
+        public RobustReliableSpoolingFileEventReader build() throws IOException {
+            return new RobustReliableSpoolingFileEventReader(spoolDirectory, completedSuffix,
                     ignorePattern, trackerDirPath, annotateFileName, fileNameHeader,
                     deserializerType, deserializerContext, deletePolicy, inputCharset);
         }

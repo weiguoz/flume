@@ -21,9 +21,9 @@ import org.apache.flume.source.AbstractSource;
 /**
  * Created by weiguo on 14-1-25.
  */
-public class RobutSpoolDirectorySource extends AbstractSource implements
+public class RobustSpoolDirectorySource extends AbstractSource implements
         Configurable, EventDrivenSource {
-    private static final Logger logger = LoggerFactory.getLogger(RobutReliableSpoolingFileEventReader.class);
+    private static final Logger logger = LoggerFactory.getLogger(RobustReliableSpoolingFileEventReader.class);
     private static final int POLL_DELAY_MS = 500;
 
     /* Config options */
@@ -40,7 +40,7 @@ public class RobutSpoolDirectorySource extends AbstractSource implements
     private String inputCharset;
 
     private SourceCounter sourceCounter;
-    RobutReliableSpoolingFileEventReader reader;
+    RobustReliableSpoolingFileEventReader reader;
 
     @Override
     public void start() {
@@ -49,7 +49,7 @@ public class RobutSpoolDirectorySource extends AbstractSource implements
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         File directory = new File(spoolDirectory);
         try {
-            reader = new RobutReliableSpoolingFileEventReader.Builder()
+            reader = new RobustReliableSpoolingFileEventReader.Builder()
                     .spoolDirectory(directory)
                     .completedSuffix(completedSuffix)
                     .ignorePattern(ignorePattern)
@@ -109,10 +109,10 @@ public class RobutSpoolDirectorySource extends AbstractSource implements
     }
 
     private class SpoolDirectoryRunnable implements Runnable {
-        private RobutReliableSpoolingFileEventReader reader;
+        private RobustReliableSpoolingFileEventReader reader;
         private SourceCounter sourceCounter;
 
-        public SpoolDirectoryRunnable(RobutReliableSpoolingFileEventReader reader,
+        public SpoolDirectoryRunnable(RobustReliableSpoolingFileEventReader reader,
                                       SourceCounter sourceCounter) {
             this.reader = reader;
             this.sourceCounter = sourceCounter;
